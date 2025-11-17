@@ -23,7 +23,7 @@ jobs:
       - name: Terraform Init (Remote Backend)
         run: terraform init
         env:
-          TFC_TOKEN: ${{ secrets.TFC_TOKEN }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Terraform Validate
         run: terraform validate
