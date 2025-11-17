@@ -11,10 +11,11 @@ jobs:
     name: Terraform Pipeline
     runs-on: ubuntu-latest
 
-    # 👇 Job-level env: available to ALL steps (init, plan, apply)
     env:
-      TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}   # Terraform Cloud token
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}   # (if needed)
+      # Terraform Cloud token – used by ALL terraform commands
+      TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
+      # Cloud credentials (if required by your provider)
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
@@ -36,8 +37,10 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -input=false -out=tfplan
+        # ❌ no "-out=tfplan" because remote backend can't save local plan files
+        run: terraform plan -input=false
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -input=false -auto-approve tfplan
+        # ❌ no plan file; apply directly against remote backend
+        run: terraform apply -input=false -auto-approve
